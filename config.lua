@@ -8,21 +8,54 @@ Config.WhitelistedVehicles = {}
 Config.PoliceHelicopter = 'POLMAV'
 Config.FuelResource = 'LegacyFuel' -- supports any that has a GetFuel() and SetFuel() export
 
+--LeSiiN's additions
+Config.ShowShootersLine = true -- If true it shows the Line from where the Shooter shoot the bullet
+Config.PoliceCreatesEvidence = true -- If true Police will create evidence aswell
+
+Config.CasingMarkerRGBA = { --Change the Colour of the Casing Markers
+    r = 0,
+    g = 0,
+    b = 255,
+    a = 175,
+}
+
+Config.BloodMarkerRGBA = { --Change the Colour of the Blooddrops Markers
+    r = 255,
+    g = 0,
+    b = 0,
+    a = 175,
+}
+
+Config.FingerprintMarkerRGBA = { --Change the Colour of the Fingerprint Markers
+    r = 255,
+    g = 127,
+    b = 80,
+    a = 175,
+}
+
+Config.BulletholeMarkerRGBA = { --Change the Colour of the Bullethole Markers
+    r = 160,
+    g = 32,
+    b = 240,
+    a = 255,
+}
+--------------------------------------
+
 Config.AmmoLabels = {
-    ['AMMO_PISTOL'] = '9x19mm parabellum bullet',
-    ['AMMO_SMG'] = '9x19mm parabellum bullet',
-    ['AMMO_RIFLE'] = '7.62x39mm bullet',
-    ['AMMO_MG'] = '7.92x57mm mauser bullet',
-    ['AMMO_SHOTGUN'] = '12-gauge bullet',
+    ['AMMO_PISTOL'] = '9x19mm',
+    ['AMMO_SMG'] = '9x19mm',
+    ['AMMO_RIFLE'] = '7.62x39mm',
+    ['AMMO_MG'] = '7.92x57mm',
+    ['AMMO_SHOTGUN'] = '12-gauge',
     ['AMMO_SNIPER'] = 'Large caliber bullet',
 }
 
 Config.Objects = {
-    ['cone'] = { model = `prop_roadcone02a`, freeze = false },
-    ['barrier'] = { model = `prop_barrier_work06a`, freeze = true },
-    ['roadsign'] = { model = `prop_snow_sign_road_06g`, freeze = true },
-    ['tent'] = { model = `prop_gazebo_03`, freeze = true },
-    ['light'] = { model = `prop_worklight_03b`, freeze = true },
+    ['cone'] = { model = 'prop_roadcone02a', freeze = false },
+    ['barrier'] = { model = 'prop_barrier_work06a', freeze = true },
+    ['roadsign'] = { model = 'prop_snow_sign_road_06g', freeze = true },
+    ['tent'] = { model = 'prop_gazebo_03', freeze = true },
+    ['light'] = { model = 'prop_worklight_03b', freeze = true },
 }
 
 Config.Locations = {
