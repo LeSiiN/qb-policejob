@@ -2,6 +2,8 @@
 local Plates = {}
 local PlayerStatus = {}
 local Casings = {}
+local Bullethole = {}
+local Fragements = {}
 local BloodDrops = {}
 local FingerDrops = {}
 local Objects = {}
@@ -68,6 +70,32 @@ local function CreateCasingId()
     else
         local caseId = math.random(10000, 99999)
         return caseId
+    end
+end
+
+local function CreateBulletholeId()
+    if Bullethole then
+        local holesId = math.random(10000, 99999)
+        while Bullethole[holesId] do
+            holesId = math.random(10000, 99999)
+        end
+        return holesId
+    else
+        local holesId = math.random(10000, 99999)
+        return holesId
+    end
+end
+
+local function CreateVehicleFragementId()
+    if VehicleFragement then
+        local fragementId = math.random(10000, 99999)
+        while VehicleFragement[fragementId] do
+            fragementId = math.random(10000, 99999)
+        end
+        return fragementId
+    else
+        local fragementId = math.random(10000, 99999)
+        return fragementId
     end
 end
 
@@ -217,6 +245,45 @@ QBCore.Commands.Add('clearcasings', Lang:t('commands.clear_casign'), {}, false, 
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
     end
 end)
+
+QBCore.Commands.Add('clearholes', Lang:t('commands.clear_bullethole'), {}, false, function(source)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
+        TriggerClientEvent('evidence:client:ClearBulletholeInArea', src)
+    else
+        TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
+    end
+end)
+
+QBCore.Commands.Add('clearfragements', Lang:t('commands.clear_fragements'), {}, false, function(source)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
+        TriggerClientEvent('evidence:client:ClearVehicleFragementsInArea', src)
+    else
+        TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
+    end
+end)
+
+QBCore.Commands.Add('clearscene', Lang:t('commands.clear_crime_scene'), {}, false, function(source)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
+        TriggerClientEvent('evidence:client:ClearScene', src)
+    else
+        TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
+    end
+end)
+
+QBCore.Functions.CreateUseableItem("rag", function(source)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if not Player then return end
+    if not Player.Functions.RemoveItem("rag", 1) then return end
+    TriggerClientEvent('evidence:client:ClearSceneCrime', src)
+end)
+
 
 QBCore.Commands.Add('jail', Lang:t('commands.jail_player'), {}, false, function(source)
     local src = source
@@ -972,10 +1039,20 @@ RegisterNetEvent('evidence:server:ClearBlooddrops', function(blooddropList)
     end
 end)
 
+RegisterNetEvent('evidence:server:ClearFingerprints', function(fingerprintList)
+    if fingerprintList and next(fingerprintList) then
+        for _, v in pairs(fingerprintList) do
+            TriggerClientEvent('evidence:client:RemoveFingerprint', -1, v)
+            FingerDrops[v] = nil
+        end
+    end
+end)
+
 RegisterNetEvent('evidence:server:AddBlooddropToInventory', function(bloodId, bloodInfo)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
+        TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
         if Player.Functions.AddItem('filled_evidence_bag', 1, false, bloodInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveBlooddrop', -1, bloodId)
@@ -990,6 +1067,7 @@ RegisterNetEvent('evidence:server:AddFingerprintToInventory', function(fingerId,
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
+        TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
         if Player.Functions.AddItem('filled_evidence_bag', 1, false, fingerInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveFingerprint', -1, fingerId)
@@ -998,23 +1076,6 @@ RegisterNetEvent('evidence:server:AddFingerprintToInventory', function(fingerId,
     else
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
     end
-end)
-
-RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords)
-    local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-    local casingId = CreateCasingId()
-    local weaponInfo = QBCore.Shared.Weapons[weapon]
-    local serieNumber = nil
-    if weaponInfo then
-        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
-        if weaponItem then
-            if weaponItem.info and weaponItem.info ~= '' then
-                serieNumber = weaponItem.info.serie
-            end
-        end
-    end
-    TriggerClientEvent('evidence:client:AddCasing', -1, casingId, weapon, coords, serieNumber)
 end)
 
 RegisterNetEvent('police:server:UpdateCurrentCops', function()
@@ -1031,6 +1092,23 @@ RegisterNetEvent('police:server:UpdateCurrentCops', function()
     updatingCops = false
 end)
 
+RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords, currentTime)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local casingId = CreateCasingId()
+    local weaponInfo = QBCore.Shared.Weapons[weapon]
+    local serieNumber = nil
+    if weaponInfo then
+        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+        if weaponItem then
+            if weaponItem.info and weaponItem.info ~= '' then
+                serieNumber = weaponItem.info.serie
+            end
+        end
+    end
+    TriggerClientEvent('evidence:client:AddCasing', -1, casingId, weapon, coords, serieNumber, currentTime)
+end)
+
 RegisterNetEvent('evidence:server:ClearCasings', function(casingList)
     if casingList and next(casingList) then
         for _, v in pairs(casingList) do
@@ -1044,6 +1122,7 @@ RegisterNetEvent('evidence:server:AddCasingToInventory', function(casingId, casi
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
+        TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
         if Player.Functions.AddItem('filled_evidence_bag', 1, false, casingInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveCasing', -1, casingId)
@@ -1053,6 +1132,93 @@ RegisterNetEvent('evidence:server:AddCasingToInventory', function(casingId, casi
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
     end
 end)
+
+--
+
+RegisterNetEvent('evidence:server:CreateBullethole', function(weapon, raycastcoords, pedcoords, heading, currentTime)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local bulletholeId = CreateBulletholeId()
+    local weaponInfo = QBCore.Shared.Weapons[weapon]
+    local serieNumber = nil
+    if weaponInfo then
+        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+        if weaponItem then
+            if weaponItem.info and weaponItem.info ~= '' then
+                serieNumber = weaponItem.info.serie
+            end
+        end
+    end
+    TriggerClientEvent('evidence:client:AddBullethole', -1, bulletholeId, weapon, raycastcoords, pedcoords, heading, currentTime, serieNumber)
+end)
+
+RegisterNetEvent('evidence:server:ClearBullethole', function(bulletholeList)
+    if bulletholeList and next(bulletholeList) then
+        for _, v in pairs(bulletholeList) do
+            TriggerClientEvent('evidence:client:RemoveBullethole', -1, v)
+            Bullethole[v] = nil
+        end
+    end
+end)
+
+RegisterNetEvent('evidence:server:AddBulletToInventory', function(bulletholeId, bulletInfo)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
+        TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
+        if Player.Functions.AddItem('filled_evidence_bag', 1, false, bulletInfo) then
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
+            TriggerClientEvent('evidence:client:RemoveBullethole', -1, bulletholeId)
+            Bullethole[bulletholeId] = nil
+        end
+    else
+        TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
+    end
+end)
+--
+
+RegisterNetEvent('evidence:server:CreateVehicleFragement', function(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local vehiclefragementId = CreateVehicleFragementId()
+    local weaponInfo = QBCore.Shared.Weapons[weapon]
+    local serieNumber = nil
+    if weaponInfo then
+        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+        if weaponItem then
+            if weaponItem.info and weaponItem.info ~= '' then
+                serieNumber = weaponItem.info.serie
+            end
+        end
+    end
+    TriggerClientEvent('evidence:client:AddVehicleFragement', -1, vehiclefragementId, weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b, serieNumber)
+end)
+
+RegisterNetEvent('evidence:server:ClearVehicleFragements', function(vehiclefragmentList)
+    if vehiclefragmentList and next(vehiclefragmentList) then
+        for _, v in pairs(vehiclefragmentList) do
+            TriggerClientEvent('evidence:client:RemoveVehicleFragement', -1, v)
+            Fragements[v] = nil
+        end
+    end
+end)
+
+RegisterNetEvent('evidence:server:AddFragementToInventory', function(vehiclefragementId, fragementInfo)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
+        TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
+        if Player.Functions.AddItem('filled_evidence_bag', 1, false, fragementInfo) then
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
+            TriggerClientEvent('evidence:client:RemoveVehicleFragement', -1, vehiclefragementId)
+            Fragements[vehiclefragementId] = nil
+        end
+    else
+        TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
+    end
+end)
+
+--
 
 RegisterNetEvent('police:server:showFingerprint', function(playerId)
     local src = source
