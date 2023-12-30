@@ -1,25 +1,9 @@
 # qb-policejob
-This is the Version of 31.12.2023 / 1.3.5
-Nothing got changed, instead of the evidence!
-Please go through the Config, i added some new things
+  This is the Version of 31.12.2023 / 1.3.5
+  Nothing got changed, instead of the evidence!
+  Please go through the Config, i added some new things!
 
-# License
-
-    QBCore Framework
-    Copyright (C) 2021 Joshua Eger
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>
+  Thats a edit by LeSiiN <3
 
 ## Dependencies
 - [qb-core](https://github.com/qbcore-framework/qb-core)
@@ -33,19 +17,54 @@ Please go through the Config, i added some new things
 - [qb-menu](https://github.com/qbcore-framework/qb-menu) - For the vehicle menus
 - [qb-input](https://github.com/qbcore-framework/qb-input) - For accessing evidence stashes
 
-
-## Screenshots
-![On Duty / Off Duty](https://imgur.com/KO2ydlt.png)
-![Whitelisted Police Armory](https://imgur.com/TQVIYFb.png)
-![Whitelisted Police Stash](https://imgur.com/Hh2fbs4.png)
-![Vehicle Spawner](https://imgur.com/plgZ9oD.png)
-![Helicopter Spawner](https://imgur.com/jE2IoqK.png)
-![Fingerprint Scan](https://imgur.com/btmurxh.png)
-![Evidence Stash](https://imgur.com/KBOoUy5.png)
-![Spike Placing](https://imgur.com/mTN6c0h.png)
-![Object Placing](https://imgur.com/7Jate4f.png)
-![Police Alert](https://imgur.com/rAIiWYH.png)
-![Securty Cam](https://imgur.com/vFr8nWf.png)
+## Installation
+### Manual
+- Download the script and put it in the `[qb]` directory.
+- Add the following code to your server.cfg/resouces.cfg
+```
+ensure qb-core
+ensure qb-policejob
+```
+- Place the next code inside your items.lua
+```
+rag                         = { name = 'rag', label = 'Rag', weight = 100, type = 'item', image = 'rag.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Could get Handy.' },
+```
+- Place the image inside your images folder in your inventory.
+- Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365)
+```
+        case "filled_evidence_bag":
+            if (itemData.info.type == "casing") {
+                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
+                <p><strong>Type number: </strong><span>${itemData.info.ammotype}</span></p>
+                <p><strong>Caliber: </strong><span>${itemData.info.ammolabel}</span></p>
+                <p><strong>Serial Number: </strong><span>${itemData.info.serie}</span></p>
+                <p><strong>Crime scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
+            } else if (itemData.info.type == "bullet") {
+                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
+                <p><strong>Type number: </strong><span>${itemData.info.ammotype}</span></p>
+                <p><strong>Bullet: </strong><span>${itemData.info.ammolabel}</span></p>
+                <p><strong>Serial Number: </strong><span>${itemData.info.serie}</span></p>
+                <p><strong>Crime scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
+            } else if (itemData.info.type == "vehiclefragement") {
+                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
+                <p><strong>Type number: </strong><span>${itemData.info.ammotype}</span></p>
+                <p><strong>Serial Number: </strong><span>${itemData.info.serie}</span></p>
+                <p><strong>Color: </strong><span>${itemData.info.rgb}</span></p>
+                <p><strong>Crime scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
+            } else if (itemData.info.type == "blood") {
+                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
+                <p><strong>Blood type: </strong><span>${itemData.info.bloodtype}</span></p>
+                <p><strong>DNA Code: </strong><span>${itemData.info.dnalabel}</span></p>
+                <p><strong>Crime scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
+            } else if (itemData.info.type == "fingerprint") {
+                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
+                <p><strong>Fingerprint: </strong><span>${itemData.info.fingerprint}</span></p>
+                <p><strong>Crime Scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
+            } else if (itemData.info.type == "dna") {
+                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
+                <p><strong>DNA Code: </strong><span>${itemData.info.dnalabel}</span></p><br /><p>${itemData.description}</p>`;
+            }
+```
 
 ## Features
 - Classical requirements like on duty/off duty, clothing, vehicle, stash etc.
@@ -106,52 +125,3 @@ Please go through the Config, i added some new things
 
 ### New Items
 - rag - Allows Criminals to delete nearby Evidence.
-
-## Installation
-### Manual
-- Download the script and put it in the `[qb]` directory.
-- Add the following code to your server.cfg/resouces.cfg
-```
-ensure qb-core
-ensure qb-policejob
-```
-- Place the next code inside your items.lua
-```
-rag                         = { name = 'rag', label = 'Rag', weight = 100, type = 'item', image = 'rag.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Could get Handy.' },
-```
-- Place the image inside your images folder in your inventory.
-- Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365)
-```
-        case "filled_evidence_bag":
-            if (itemData.info.type == "casing") {
-                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
-                <p><strong>Type number: </strong><span>${itemData.info.ammotype}</span></p>
-                <p><strong>Caliber: </strong><span>${itemData.info.ammolabel}</span></p>
-                <p><strong>Serial Number: </strong><span>${itemData.info.serie}</span></p>
-                <p><strong>Crime scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
-            } else if (itemData.info.type == "bullet") {
-                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
-                <p><strong>Type number: </strong><span>${itemData.info.ammotype}</span></p>
-                <p><strong>Bullet: </strong><span>${itemData.info.ammolabel}</span></p>
-                <p><strong>Serial Number: </strong><span>${itemData.info.serie}</span></p>
-                <p><strong>Crime scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
-            } else if (itemData.info.type == "vehiclefragement") {
-                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
-                <p><strong>Type number: </strong><span>${itemData.info.ammotype}</span></p>
-                <p><strong>Serial Number: </strong><span>${itemData.info.serie}</span></p>
-                <p><strong>Color: </strong><span>${itemData.info.rgb}</span></p>
-                <p><strong>Crime scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
-            } else if (itemData.info.type == "blood") {
-                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
-                <p><strong>Blood type: </strong><span>${itemData.info.bloodtype}</span></p>
-                <p><strong>DNA Code: </strong><span>${itemData.info.dnalabel}</span></p>
-                <p><strong>Crime scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
-            } else if (itemData.info.type == "fingerprint") {
-                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
-                <p><strong>Fingerprint: </strong><span>${itemData.info.fingerprint}</span></p>
-                <p><strong>Crime Scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
-            } else if (itemData.info.type == "dna") {
-                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
-                <p><strong>DNA Code: </strong><span>${itemData.info.dnalabel}</span></p><br /><p>${itemData.description}</p>`;
-            }
-```
