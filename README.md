@@ -86,7 +86,6 @@ rag                         = { name = 'rag', label = 'Rag', weight = 100, type 
 - Evidence can be checked via weapon_flashlight ( can be picked up )
 - Criminals can remove evidence
 - Evidence automatically removes after 30Min. (Performance thing)
-- Evidence automatically removes when Raining or Thunder. (Performance thing)
 
 ### Commands
 - /spikestrip - Places spike strip on ground.
