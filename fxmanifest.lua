@@ -1,8 +1,8 @@
 fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
-description 'QB-PoliceJob'
-version '1.3.5'
+description 'QB-PoliceJob edit by LeSiiN'
+version '0.0.1'
 
 shared_scripts {
 	'config.lua',
